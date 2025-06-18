@@ -4,7 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import Header from '@/components/Header'
 import SearchBar from '@/components/SearchBar'
 import axios from 'axios'
-// import { PUBLIC_API_KEY } from '@env'
+import { PUBLIC_API_KEY } from '@env'
 import { NewsDataType } from '@/types'
 import BreakingNews from '@/components/BreakingNews'
 
@@ -16,8 +16,8 @@ const Page = (props: Props) => {
   //call api breaking news
   const getBreakingNews = async () => {
     try {
-      // const URL = `https://newsdata.io/api/1/latest?apikey=${PUBLIC_API_KEY}&language=vi&country=vi&image=1&removeduplicate=1&size=5`
-      const URL = `https://newsdata.io/api/1/latest?apikey=pub_04287d7f849f46f49c6930e83efb780b&language=vi&country=vi&image=1&removeduplicate=1&size=5`
+      const URL = `https://newsdata.io/api/1/latest?apikey=${PUBLIC_API_KEY}&language=vi&country=vi&image=1&removeduplicate=1&size=5`
+      // const URL = `https://newsdata.io/api/1/latest?apikey=pub_04287d7f849f46f49c6930e83efb780b&language=vi&country=vi&image=1&removeduplicate=1&size=5`
       const response = await axios.get(URL)
 
       if (response && response.data) {
@@ -35,7 +35,7 @@ const Page = (props: Props) => {
     <View style={[styles.container, { paddingTop: safeTop }]}>
       <Header />
       <SearchBar />
-      <BreakingNews />
+      <BreakingNews newList={breakingNewsData} />
     </View>
   )
 }
