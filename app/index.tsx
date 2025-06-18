@@ -1,7 +1,7 @@
 import { ImageBackground, StatusBar, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React from "react";
 import { useRouter } from "expo-router";
-import { Colors } from "@/constants/Colors";
+import { Colors } from "../constants/Colors";
 import Animated, { FadeInDown, FadeInRight } from "react-native-reanimated";
 
 const Page = () => {
@@ -10,13 +10,13 @@ const Page = () => {
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
-      <ImageBackground source={require('@/assets/images/main-image.jpg')} style={{ flex: 1 }} resizeMode="cover">
+      <ImageBackground source={require('../assets/images/main-image.jpg')} style={{ flex: 1 }} resizeMode="cover">
         <View style={styles.wrapper}>
           <Animated.Text style={styles.title} entering={FadeInRight.delay(300).duration(1500)}>Xin Chào!</Animated.Text>
           <Animated.Text style={styles.description} entering={FadeInRight.delay(500).duration(1500)}>Khám phá tin tức mới mỗi ngày!</Animated.Text>
           <Animated.View entering={FadeInDown.delay(600).duration(1000)}>
             <TouchableOpacity style={styles.button} onPress={() => router.replace("/(tabs)")}>
-              <Text style={styles.buttonText}>Đọc Ngay</Text>
+              <Text style={styles.buttonText}>Đọc Ngay!</Text>
             </TouchableOpacity>
           </Animated.View>
         </View>
