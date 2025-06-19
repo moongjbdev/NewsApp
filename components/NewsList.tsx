@@ -1,36 +1,44 @@
-import newsCategoryList from '@/constants/Categories'
+
 import { Colors } from '@/constants/Colors'
 import { NewsDataType } from '@/types'
-import React, { useRef, useState } from 'react'
-import { findNodeHandle, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import Animated, { SharedValue } from 'react-native-reanimated'
+import React from 'react'
+import { findNodeHandle, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+
 import Loading from './Loading'
+import { Link } from 'expo-router'
 type Props = {
     newsList: NewsDataType[]
 }
 const NewsList = ({ newsList }: Props) => {
 
     return (
+
         <View style={styles.container}>
             {newsList.length == 0 ? (
                 <Loading size='large' />
             ) : (
-                newsList.map((item, index) => (
-                    <View key={item.article_id} style={styles.itemContainer}>
-                        <Image source={{ uri: item.image_url }} style={styles.itemImage} />
-                        <View style={styles.itemInfo}>
-                            <Text style={styles.itemCategory}>{item.category}</Text>
-                            <Text style={styles.itemTitle}>{item.title}</Text>
-                            <View style={styles.itemSrcInfo}>
-                                <Image source={{ uri: item.source_icon }} style={styles.itemSrcImage} />
-                                <Text style={styles.itemSrcName}>{item.source_name}</Text>
-                            </View>
 
-                        </View>
-                    </View>
+                newsList.map((item, index) => (
+                    <Link href={`/news/${item.article_id}` as any} asChild key={item.article_id}>
+                        <TouchableOpacity>
+                            <View style={styles.itemContainer}>
+                                <Image source={{ uri: item.image_url }} style={styles.itemImage} />
+                                <View style={styles.itemInfo}>
+                                    <Text style={styles.itemCategory}>{item.category}</Text>
+                                    <Text style={styles.itemTitle}>{item.title}</Text>
+                                    <View style={styles.itemSrcInfo}>
+                                        <Image source={{ uri: item.source_icon }} style={styles.itemSrcImage} />
+                                        <Text style={styles.itemSrcName}>{item.source_name}</Text>
+                                    </View>
+
+                                </View>
+                            </View>
+                        </TouchableOpacity>
+                    </Link>
                 ))
             )}
         </View>
+
     )
 }
 

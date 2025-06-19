@@ -23,7 +23,6 @@ const Page = (props: Props) => {
   const getBreakingNews = async () => {
     try {
       const URL = `https://newsdata.io/api/1/latest?apikey=${PUBLIC_API_KEY}&language=vi&country=vi&image=1&removeduplicate=1&size=5`
-      // const URL = `https://newsdata.io/api/1/latest?apikey="""""""""'"apikey""""""'"""""""""&language=vi&country=vi&image=1&removeduplicate=1&size=5`
       const response = await axios.get(URL)
 
       if (response && response.data) {
