@@ -74,20 +74,24 @@ const SliderItem = ({ sliderItem, index, scrollX }: Props) => {
 
     return (
         <Animated.View style={[styles.itemWrapper, rnStyle]} key={sliderItem.article_id}>
-            <Image source={{ uri: sliderItem.image_url }} style={styles.image} />
-            <LinearGradient
-                colors={['transparent', 'rgba(0,0,0,0.8)']}
-                style={styles.background}
-            >
-                <View style={styles.sourceInfo}>
-                    {sliderItem.source_icon && (
-                        <Image source={{ uri: sliderItem.source_icon }} style={styles.srcIcon} />
-                    )}
-                    <Text style={styles.sourceName} >{sliderItem.source_name}</Text>
-                </View>
-                <Text style={styles.title} numberOfLines={2}>{sliderItem.title}</Text>
+            <View style={{ borderRadius: 20, overflow: 'hidden' }}>
 
-            </LinearGradient>
+
+                <Image source={{ uri: sliderItem.image_url }} style={styles.image} />
+                <LinearGradient
+                    colors={['transparent', 'rgba(0,0,0,0.8)']}
+                    style={styles.background}
+                >
+                    <View style={styles.sourceInfo}>
+                        {sliderItem.source_icon && (
+                            <Image source={{ uri: sliderItem.source_icon }} style={styles.srcIcon} />
+                        )}
+                        <Text style={styles.sourceName} >{sliderItem.source_name}</Text>
+                    </View>
+                    <Text style={styles.title} numberOfLines={2}>{sliderItem.title}</Text>
+
+                </LinearGradient>
+            </View>
         </Animated.View>
     )
 }

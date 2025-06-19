@@ -1,9 +1,9 @@
 import { Colors } from '@/constants/Colors'
 import { NewsDataType } from '@/types'
-import React, { useEffect, useState } from 'react'
-import { Dimensions, FlatList, StyleSheet, Text, View } from 'react-native'
+import React, { useEffect, useRef, useState } from 'react'
+import { Dimensions, FlatList, StyleSheet, Text, useWindowDimensions, View, ViewToken } from 'react-native'
 import SliderItem from './SliderItem'
-import Animated, { useAnimatedRef, useAnimatedScrollHandler, useSharedValue } from 'react-native-reanimated'
+import Animated, { scrollTo, useAnimatedRef, useAnimatedScrollHandler, useDerivedValue, useSharedValue } from 'react-native-reanimated'
 import Pagination from './Pagination'
 
 type Props = {
@@ -14,18 +14,23 @@ const ITEM_WIDTH = width * 0.85;
 const BreakingNews = ({ newList }: Props) => {
     const [data, setData] = useState<Array<NewsDataType>>([]);
 
-    useEffect(() => {
-        setData(newList);
-    }, [newList]);
-
     const [paginationIndex, setPaginationIndex] = useState(0);
     const scrollX = useSharedValue(0);
     const ref = useAnimatedRef<Animated.FlatList<any>>()
+
+    const [isAutoPlay, setIsAutoPlay] = useState(true);
+    const interval = useRef<NodeJS.Timeout>();
+    const offset = useSharedValue(0);
+    const { width } = useWindowDimensions();
+
 
     const onScrollHandler = useAnimatedScrollHandler({
         onScroll: (e) => {
             scrollX.value = e.contentOffset.x
         },
+        onMomentumEnd: (e) => {
+            offset.value = e.contentOffset.x
+        }
     })
 
     const handleLoadMore = () => {
@@ -33,6 +38,50 @@ const BreakingNews = ({ newList }: Props) => {
 
         setData((prev) => [...prev, ...moreData]);
     };
+
+    const onViewableItemsChanged = ({
+        viewableItems,
+    }: {
+        viewableItems: ViewToken[]
+    }) => {
+        if (
+            viewableItems[0].index !== undefined &&
+            viewableItems[0].index !== null
+        ) {
+            setPaginationIndex(viewableItems[0].index % newList.length)
+        }
+    }
+
+    const viewabilityConfig = {
+        itemVisiblePercentThreshold: 50
+    }
+
+    const viewabilityConfigCallbackPairs = useRef([
+        { viewabilityConfig, onViewableItemsChanged }
+    ])
+
+    useEffect(() => {
+        if (isAutoPlay === true) {
+            interval.current = setInterval(() => {
+                offset.value = offset.value + ITEM_WIDTH;
+            }, 5000);
+        } else {
+            clearInterval(interval.current);
+        }
+
+        return () => {
+            clearInterval(interval.current);
+        };
+    }, [isAutoPlay, offset, width]);
+
+    useDerivedValue(() => {
+        scrollTo(ref, offset.value, 0, true);
+    });
+
+
+    useEffect(() => {
+        setData(newList);
+    }, [newList]);
 
     return (
         <View style={styles.container}>
@@ -53,8 +102,22 @@ const BreakingNews = ({ newList }: Props) => {
                     scrollEventThrottle={16}
                     onEndReachedThreshold={0.5}
                     onEndReached={handleLoadMore}
+                    // viewabilityConfigCallbackPairs={
+                    //     viewabilityConfigCallbackPairs.current
+                    // }
+                    onViewableItemsChanged={onViewableItemsChanged}
+                    viewabilityConfig={viewabilityConfig}
+                    onScrollBeginDrag={() => {
+                        setIsAutoPlay(false);
+                    }}
+
+                    onScrollEndDrag={() => {
+                        setIsAutoPlay(true);
+                    }}
+
                 />
-                <Pagination />
+                <Pagination items={newList} paginationIndex={paginationIndex} scrollX={scrollX} />
+
             </View>
         </View>
     )
@@ -76,5 +139,6 @@ const styles = StyleSheet.create({
         // width: "100%",
         // flex: 1,
         justifyContent: 'center'
-    }
+    },
+
 })
