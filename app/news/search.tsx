@@ -12,33 +12,27 @@ const search = () => {
     const [news, setNews] = useState<NewsDataType[]>([])
     const [isLoading, setIsLoading] = useState(true)
     const getNews = async () => {
+        setIsLoading(true); // Bắt đầu loading
         try {
             let url = `https://newsdata.io/api/1/latest?apikey=${PUBLIC_API_KEY}&image=1&removeduplicate=1&size=10`
-            if (category) {
-                url += `&category=${category}`
-            }
+            if (category) url += `&category=${category}`
+            if (country) url += `&country=${country}`
+            if (query) url += `&q=${query}`
 
-            if (country) {
-                url += `&country=${country}`
-            }
-
-            if (query) {
-                url += `&q=${query}`
-            }
             const response = await axios.get(url)
-
             if (response && response.data) {
                 setNews(response.data.results)
             }
         } catch (error: any) {
             console.log(error)
+        } finally {
+            setIsLoading(false);
         }
     }
 
     useEffect(() => {
         getNews();
-        setIsLoading(false)
-    }, [])
+    }, [query, category, country])
     return (
         <>
             <Stack.Screen options={{

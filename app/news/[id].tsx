@@ -21,64 +21,67 @@ const NewsList = ({ newsList }: Props) => {
     const [isLoading, setIsLoading] = useState(true)
     const [bookmark, setBookmark] = useState(false)
 
+    // const toggleBookmark = async (newsId: string) => {
+    //     try {
+    //         const stored = await AsyncStorage.getItem("bookmark");
+    //         let savedList: string[] = [];
 
-    // const saveBookmark = async (newsId: string) => {
-    //     setBookmark(true)
-    //     await AsyncStorage.getItem("bookmark").then((token) => {
-    //         const res = JSON.parse(token)
-    //         if (res !== null) {
-    //             let data = res.find((value: string) => value === newsId)
-    //             if (data == null) {
-    //                 res.push(newsId)
-    //                 AsyncStorage.setItem("bookmark", JSON.stringify(res))
-    //                 alert("Tin Đã Được Thêm Vào Mục Yêu Thích!")
+    //         if (stored) {
+    //             savedList = JSON.parse(stored);
+
+    //             const isBookmarked = savedList.includes(newsId);
+
+    //             if (isBookmarked) {
+    //                 // Nếu đã bookmark thì xóa
+    //                 const updatedList = savedList.filter(id => id !== newsId);
+    //                 await AsyncStorage.setItem("bookmark", JSON.stringify(updatedList));
+    //                 setBookmark(false);
+    //                 Alert.alert("Thông báo", "Đã xóa khỏi mục yêu thích.");
+    //                 return;
     //             }
-    //         } else {
-    //             let bookmark = []
-    //             bookmark.push(newsId)
-    //             AsyncStorage.setItem("bookmark", JSON.stringify(bookmark))
-    //             alert("Tin Đã Được Thêm Vào Mục Yêu Thích!")
     //         }
-    //     })
-    // }
 
-    const toggleBookmark = async (newsId: string) => {
+    //         // Nếu chưa bookmark thì thêm
+    //         savedList.push(newsId);
+    //         await AsyncStorage.setItem("bookmark", JSON.stringify(savedList));
+    //         setBookmark(true);
+    //         Alert.alert("Thành công", "Tin đã được thêm vào mục yêu thích!");
+    //     } catch (error) {
+    //         console.error("Lỗi khi lưu bookmark:", error);
+    //         Alert.alert("Lỗi", "Không thể xử lý mục yêu thích.");
+    //     }
+    // };
+
+    //call api
+    const toggleBookmark = async (news: NewsDataType) => {
         try {
-            const stored = await AsyncStorage.getItem("bookmark");
-            let savedList: string[] = [];
+            const token = await AsyncStorage.getItem("bookmark");
+            let bookmarks: NewsDataType[] = token ? JSON.parse(token) : [];
 
-            if (stored) {
-                savedList = JSON.parse(stored);
+            const isBookmarked = bookmarks.some(b => b.article_id === news.article_id);
 
-                const isBookmarked = savedList.includes(newsId);
-
-                if (isBookmarked) {
-                    // ❌ Nếu đã bookmark thì xóa
-                    const updatedList = savedList.filter(id => id !== newsId);
-                    await AsyncStorage.setItem("bookmark", JSON.stringify(updatedList));
-                    setBookmark(false);
-                    Alert.alert("Thông báo", "Đã xóa khỏi mục yêu thích.");
-                    return;
-                }
+            if (isBookmarked) {
+                // Nếu đã bookmark thì xóa
+                const updatedList = bookmarks.filter(b => b.article_id !== news.article_id);
+                await AsyncStorage.setItem("bookmark", JSON.stringify(updatedList));
+                setBookmark(false);
+                Alert.alert("Thông báo", "Đã xóa khỏi mục yêu thích.");
+            } else {
+                // Nếu chưa bookmark thì thêm
+                bookmarks.push(news);
+                await AsyncStorage.setItem("bookmark", JSON.stringify(bookmarks));
+                setBookmark(true);
+                Alert.alert("Thành công", "Tin đã được thêm vào mục yêu thích!");
             }
-
-            // ✅ Nếu chưa bookmark thì thêm
-            savedList.push(newsId);
-            await AsyncStorage.setItem("bookmark", JSON.stringify(savedList));
-            setBookmark(true);
-            Alert.alert("Thành công", "Tin đã được thêm vào mục yêu thích!");
         } catch (error) {
             console.error("Lỗi khi lưu bookmark:", error);
             Alert.alert("Lỗi", "Không thể xử lý mục yêu thích.");
         }
     };
-
-    //call api
     useEffect(() => {
         const fetchData = async () => {
             try {
                 setIsLoading(true);
-
                 const URL = `https://newsdata.io/api/1/latest?apikey=${PUBLIC_API_KEY}&id=${id}`;
                 const response = await axios.get(URL);
 
@@ -89,8 +92,8 @@ const NewsList = ({ newsList }: Props) => {
                     //Kiểm tra xem đã bookmark chưa
                     const stored = await AsyncStorage.getItem("bookmark");
                     if (stored) {
-                        const savedList = JSON.parse(stored);
-                        if (savedList.includes(article.article_id)) {
+                        const bookmarks: NewsDataType[] = JSON.parse(stored);
+                        if (bookmarks.some(b => b.article_id === article.article_id)) {
                             setBookmark(true);
                         } else {
                             setBookmark(false);
@@ -108,20 +111,6 @@ const NewsList = ({ newsList }: Props) => {
                 setIsLoading(false);
             }
         };
-        // const logSavedBookmarks = async () => {
-        //     try {
-        //         const stored = await AsyncStorage.getItem("bookmark");
-        //         if (stored) {
-        //             const savedList = JSON.parse(stored);
-        //             console.log("Bookmark List:", savedList);
-        //         } else {
-        //             console.log("Bookmark List is empty");
-        //         }
-        //     } catch (error) {
-        //         console.error("Error reading bookmarks:", error);
-        //     }
-        // };
-        // logSavedBookmarks()
         fetchData();
     }, [id]);
 
@@ -135,7 +124,7 @@ const NewsList = ({ newsList }: Props) => {
                     </TouchableOpacity>
                 ),
                 headerRight: () => (
-                    <TouchableOpacity onPress={() => toggleBookmark(newsDetail?.article_id || '')}>
+                    <TouchableOpacity onPress={() => newsDetail && toggleBookmark(newsDetail)}>
                         <Ionicons name={bookmark ? 'heart' : 'heart-outline'} size={22} color={bookmark ? Colors.tint : 'black'} />
                     </TouchableOpacity>
                 ),
