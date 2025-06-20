@@ -4,12 +4,13 @@ import { NewsDataType } from '@/types'
 import { Ionicons } from '@expo/vector-icons'
 import { router, Stack, useLocalSearchParams } from 'expo-router'
 import React, { useEffect, useState } from 'react'
-import { findNodeHandle, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Alert, findNodeHandle, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { PUBLIC_API_KEY } from '@env'
 import axios from 'axios'
 import Loading from '@/components/Loading'
 import { getFakeContentByCategory } from '@/constants/ContentFake'
 import Moment from 'moment'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 type Props = {
     newsList: NewsDataType | null
 }
@@ -18,29 +19,112 @@ const NewsList = ({ newsList }: Props) => {
     const { id } = useLocalSearchParams<{ id: string }>()
     const [newsDetail, setNewsDetail] = useState<NewsDataType | null>(null)
     const [isLoading, setIsLoading] = useState(true)
+    const [bookmark, setBookmark] = useState(false)
+
+
+    // const saveBookmark = async (newsId: string) => {
+    //     setBookmark(true)
+    //     await AsyncStorage.getItem("bookmark").then((token) => {
+    //         const res = JSON.parse(token)
+    //         if (res !== null) {
+    //             let data = res.find((value: string) => value === newsId)
+    //             if (data == null) {
+    //                 res.push(newsId)
+    //                 AsyncStorage.setItem("bookmark", JSON.stringify(res))
+    //                 alert("Tin Đã Được Thêm Vào Mục Yêu Thích!")
+    //             }
+    //         } else {
+    //             let bookmark = []
+    //             bookmark.push(newsId)
+    //             AsyncStorage.setItem("bookmark", JSON.stringify(bookmark))
+    //             alert("Tin Đã Được Thêm Vào Mục Yêu Thích!")
+    //         }
+    //     })
+    // }
+
+    const toggleBookmark = async (newsId: string) => {
+        try {
+            const stored = await AsyncStorage.getItem("bookmark");
+            let savedList: string[] = [];
+
+            if (stored) {
+                savedList = JSON.parse(stored);
+
+                const isBookmarked = savedList.includes(newsId);
+
+                if (isBookmarked) {
+                    // ❌ Nếu đã bookmark thì xóa
+                    const updatedList = savedList.filter(id => id !== newsId);
+                    await AsyncStorage.setItem("bookmark", JSON.stringify(updatedList));
+                    setBookmark(false);
+                    Alert.alert("Thông báo", "Đã xóa khỏi mục yêu thích.");
+                    return;
+                }
+            }
+
+            // ✅ Nếu chưa bookmark thì thêm
+            savedList.push(newsId);
+            await AsyncStorage.setItem("bookmark", JSON.stringify(savedList));
+            setBookmark(true);
+            Alert.alert("Thành công", "Tin đã được thêm vào mục yêu thích!");
+        } catch (error) {
+            console.error("Lỗi khi lưu bookmark:", error);
+            Alert.alert("Lỗi", "Không thể xử lý mục yêu thích.");
+        }
+    };
+
+    //call api
     useEffect(() => {
         const fetchData = async () => {
             try {
-                setIsLoading(true)
-                const URL = `https://newsdata.io/api/1/latest?apikey=${PUBLIC_API_KEY}&id=${id}`
-                const response = await axios.get(URL)
+                setIsLoading(true);
+
+                const URL = `https://newsdata.io/api/1/latest?apikey=${PUBLIC_API_KEY}&id=${id}`;
+                const response = await axios.get(URL);
 
                 if (response && response.data && response.data.results?.length > 0) {
-                    setNewsDetail(response.data.results[0])
+                    const article = response.data.results[0];
+                    setNewsDetail(article);
 
+                    //Kiểm tra xem đã bookmark chưa
+                    const stored = await AsyncStorage.getItem("bookmark");
+                    if (stored) {
+                        const savedList = JSON.parse(stored);
+                        if (savedList.includes(article.article_id)) {
+                            setBookmark(true);
+                        } else {
+                            setBookmark(false);
+                        }
+                    } else {
+                        setBookmark(false);
+                    }
                 } else {
-                    setNewsDetail(null)
+                    setNewsDetail(null);
                 }
-            } catch (error: any) {
-                console.log('Error fetching news detail:', error)
-                setNewsDetail(null) // fallback nếu lỗi
+            } catch (error) {
+                console.log('Error fetching news detail:', error);
+                setNewsDetail(null);
             } finally {
-                setIsLoading(false)
+                setIsLoading(false);
             }
-        }
+        };
+        // const logSavedBookmarks = async () => {
+        //     try {
+        //         const stored = await AsyncStorage.getItem("bookmark");
+        //         if (stored) {
+        //             const savedList = JSON.parse(stored);
+        //             console.log("Bookmark List:", savedList);
+        //         } else {
+        //             console.log("Bookmark List is empty");
+        //         }
+        //     } catch (error) {
+        //         console.error("Error reading bookmarks:", error);
+        //     }
+        // };
+        // logSavedBookmarks()
+        fetchData();
+    }, [id]);
 
-        fetchData()
-    }, [id])
 
     return (
         <>
@@ -51,8 +135,8 @@ const NewsList = ({ newsList }: Props) => {
                     </TouchableOpacity>
                 ),
                 headerRight: () => (
-                    <TouchableOpacity>
-                        <Ionicons name='heart-outline' size={22} onPress={() => { }} />
+                    <TouchableOpacity onPress={() => toggleBookmark(newsDetail?.article_id || '')}>
+                        <Ionicons name={bookmark ? 'heart' : 'heart-outline'} size={22} color={bookmark ? Colors.tint : 'black'} />
                     </TouchableOpacity>
                 ),
                 title: '',

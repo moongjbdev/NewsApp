@@ -1,15 +1,15 @@
-const CountryList = [ 
-  {name: 'All', code: '',selected: false,}, 
-  {name: 'India', code: 'IN',selected: false,}, 
-  {name: 'Australia', code: 'AU',selected: false,}, 
-  {name: 'United Arab Emirates', code: 'AE',selected: false,}, 
-  {name: 'United Kingdom', code: 'GB',selected: false,}, 
-  {name: 'United States', code: 'US',selected: false,}, 
-  {name: 'France', code: 'FR',selected: false,}, 
-  {name: 'Germany', code: 'DE',selected: false,}, 
-  {name: 'Japan', code: 'JP',selected: false,}, 
-  {name: 'Israel', code: 'IL',selected: false,},  
-  {name: 'Vietname', code: 'VN',selected: false,},  
+const CountryList = [
+  { name: 'Tất Cả', code: '', selected: false, },
+  { name: 'Ấn Độ', code: 'in', selected: false, },
+  { name: 'Úc', code: 'au', selected: false, },
+  { name: 'Ả Rập', code: 'ae', selected: false, },
+  { name: 'Anh', code: 'gb', selected: false, },
+  { name: 'Mỹ', code: 'us', selected: false, },
+  { name: 'Pháp', code: 'fr', selected: false, },
+  { name: 'Đức', code: 'de', selected: false, },
+  { name: 'Nhật', code: 'jp', selected: false, },
+  { name: 'Israel', code: 'il', selected: false, },
+  { name: 'Việt Nam', code: 'vi', selected: false, },
 
 ]
 

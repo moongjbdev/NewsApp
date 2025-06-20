@@ -10,29 +10,15 @@ type Props = {
     newsList: NewsDataType[]
 }
 const NewsList = ({ newsList }: Props) => {
-
     return (
-
         <View style={styles.container}>
             {newsList.length == 0 ? (
                 <Loading size='large' />
             ) : (
-
                 newsList.map((item, index) => (
                     <Link href={`/news/${item.article_id}` as any} asChild key={item.article_id}>
                         <TouchableOpacity>
-                            <View style={styles.itemContainer}>
-                                <Image source={{ uri: item.image_url }} style={styles.itemImage} />
-                                <View style={styles.itemInfo}>
-                                    <Text style={styles.itemCategory}>{item.category}</Text>
-                                    <Text style={styles.itemTitle}>{item.title}</Text>
-                                    <View style={styles.itemSrcInfo}>
-                                        <Image source={{ uri: item.source_icon }} style={styles.itemSrcImage} />
-                                        <Text style={styles.itemSrcName}>{item.source_name}</Text>
-                                    </View>
-
-                                </View>
-                            </View>
+                            <NewsItem item={item} />
                         </TouchableOpacity>
                     </Link>
                 ))
@@ -43,6 +29,21 @@ const NewsList = ({ newsList }: Props) => {
 }
 
 export default NewsList
+export const NewsItem = ({ item }: { item: NewsDataType }) => {
+    return (
+        <View style={styles.itemContainer}>
+            <Image source={{ uri: item.image_url }} style={styles.itemImage} />
+            <View style={styles.itemInfo}>
+                <Text style={styles.itemCategory}>{item.category}</Text>
+                <Text style={styles.itemTitle}>{item.title}</Text>
+                <View style={styles.itemSrcInfo}>
+                    <Image source={{ uri: item.source_icon }} style={styles.itemSrcImage} />
+                    <Text style={styles.itemSrcName}>{item.source_name}</Text>
+                </View>
+            </View>
+        </View>
+    )
+}
 const styles = StyleSheet.create({
     container: {
         marginHorizontal: 20,
