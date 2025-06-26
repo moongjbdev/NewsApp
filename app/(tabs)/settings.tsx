@@ -18,23 +18,23 @@ const Page = (props: Props) => {
       }} />
       <View style={styles.container}>
         <TouchableOpacity style={styles.itemBtn}>
-          <Text style={styles.itemBtnTxt}>About</Text>
+          <Text style={styles.itemBtnTxt}>Về Chúng Tôi</Text>
           <MaterialIcons name='arrow-forward-ios' size={16} color={Colors.lightGrey} />
         </TouchableOpacity>
         <TouchableOpacity style={styles.itemBtn}>
-          <Text style={styles.itemBtnTxt}>Send Feedback</Text>
+          <Text style={styles.itemBtnTxt}>Gửi Phản Hồi</Text>
           <MaterialIcons name='arrow-forward-ios' size={16} color={Colors.lightGrey} />
         </TouchableOpacity>
         <TouchableOpacity style={styles.itemBtn}>
-          <Text style={styles.itemBtnTxt}>Privacy Policy</Text>
+          <Text style={styles.itemBtnTxt}>Chính Sác Bảo Mật</Text>
           <MaterialIcons name='arrow-forward-ios' size={16} color={Colors.lightGrey} />
         </TouchableOpacity>
         <TouchableOpacity style={styles.itemBtn}>
-          <Text style={styles.itemBtnTxt}>Terms of Use</Text>
+          <Text style={styles.itemBtnTxt}>Điều Khoản Sử Dụng</Text>
           <MaterialIcons name='arrow-forward-ios' size={16} color={Colors.lightGrey} />
         </TouchableOpacity>
         <TouchableOpacity style={styles.itemBtn} onPress={toggleSwitch}>
-          <Text style={styles.itemBtnTxt}>Dark Mode</Text>
+          <Text style={styles.itemBtnTxt}>Chế Độ Tối</Text>
           <View style={styles.switchWrapper}>
             <Switch
               style={styles.switch}
@@ -47,7 +47,7 @@ const Page = (props: Props) => {
           </View>
         </TouchableOpacity>
         <TouchableOpacity style={styles.itemBtn}>
-          <Text style={[styles.itemBtnTxt, { color: Colors.tint }]}>Logout</Text>
+          <Text style={[styles.itemBtnTxt, { color: Colors.tint }]}>Đăng Xuất</Text>
           <MaterialIcons name='logout' size={16} color={Colors.tint} />
         </TouchableOpacity>
       </View>
