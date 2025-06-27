@@ -46,15 +46,6 @@ const Page = (props: Props) => {
     fetchNewsByCategory(category);
   }, [fetchNewsByCategory]);
 
-  if (error && !isLoading) {
-    return (
-      <View style={[styles.container, { paddingTop: safeTop, backgroundColor: colors.background }]}>
-        <Header />
-        <ErrorView message={error} onRetry={refreshData} />
-      </View>
-    )
-  }
-
   const renderHeader = useMemo(() => (
     <>
       <Header />
@@ -75,6 +66,15 @@ const Page = (props: Props) => {
       </TouchableOpacity>
     </Link>
   );
+
+  if (error && !isLoading) {
+    return (
+      <View style={[styles.container, { paddingTop: safeTop, backgroundColor: colors.background }]}>
+        <Header />
+        <ErrorView message={error} onRetry={refreshData} />
+      </View>
+    )
+  }
 
   return (
     <FlatList
