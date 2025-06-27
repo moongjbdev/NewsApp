@@ -5,13 +5,17 @@ import { Dimensions, FlatList, StyleSheet, Text, useWindowDimensions, View, View
 import SliderItem from './SliderItem'
 import Animated, { scrollTo, useAnimatedRef, useAnimatedScrollHandler, useDerivedValue, useSharedValue } from 'react-native-reanimated'
 import Pagination from './Pagination'
+import { useTheme } from '@/contexts/ThemeContext'
 
 type Props = {
     newList: Array<NewsDataType>
 }
+
 const { width } = Dimensions.get('screen')
 const ITEM_WIDTH = width * 0.85;
+
 const BreakingNews = ({ newList }: Props) => {
+    const { colors } = useTheme();
     const [data, setData] = useState<Array<NewsDataType>>([]);
 
     const [paginationIndex, setPaginationIndex] = useState(0);
@@ -22,7 +26,6 @@ const BreakingNews = ({ newList }: Props) => {
     const interval = useRef<NodeJS.Timeout>();
     const offset = useSharedValue(0);
     const { width } = useWindowDimensions();
-
 
     const onScrollHandler = useAnimatedScrollHandler({
         onScroll: (e) => {
@@ -35,7 +38,6 @@ const BreakingNews = ({ newList }: Props) => {
 
     const handleLoadMore = () => {
         const moreData = [...newList];
-
         setData((prev) => [...prev, ...moreData]);
     };
 
@@ -78,14 +80,13 @@ const BreakingNews = ({ newList }: Props) => {
         scrollTo(ref, offset.value, 0, true);
     });
 
-
     useEffect(() => {
         setData(newList);
     }, [newList]);
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Tin tức mới nhất</Text>
+            <Text style={[styles.title, { color: colors.black }]}>Tin tức mới nhất</Text>
             <View style={styles.slideWrapper}>
                 <Animated.FlatList
                     ref={ref}
@@ -102,28 +103,23 @@ const BreakingNews = ({ newList }: Props) => {
                     scrollEventThrottle={16}
                     onEndReachedThreshold={0.5}
                     onEndReached={handleLoadMore}
-                    // viewabilityConfigCallbackPairs={
-                    //     viewabilityConfigCallbackPairs.current
-                    // }
                     onViewableItemsChanged={onViewableItemsChanged}
                     viewabilityConfig={viewabilityConfig}
                     onScrollBeginDrag={() => {
                         setIsAutoPlay(false);
                     }}
-
                     onScrollEndDrag={() => {
                         setIsAutoPlay(true);
                     }}
-
                 />
                 <Pagination items={newList} paginationIndex={paginationIndex} scrollX={scrollX} />
-
             </View>
         </View>
     )
 }
 
 export default BreakingNews
+
 const styles = StyleSheet.create({
     container: {
         marginBottom: 10
@@ -131,14 +127,10 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 18,
         fontWeight: '600',
-        color: Colors.black,
         marginBottom: 10,
         marginLeft: 20
     },
     slideWrapper: {
-        // width: "100%",
-        // flex: 1,
         justifyContent: 'center'
     },
-
 })

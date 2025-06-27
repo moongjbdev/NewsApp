@@ -1,112 +1,88 @@
-import { ScrollView, StyleSheet, Text, View, RefreshControl } from 'react-native'
-import React, { useEffect, useState, useCallback } from 'react'
+import { FlatList, StyleSheet, Text, View, RefreshControl, TouchableOpacity } from 'react-native'
+import React, { useState, useCallback } from 'react'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import Header from '@/components/Header'
 import SearchBar from '@/components/SearchBar'
-import axios from 'axios'
-import { PUBLIC_API_KEY } from '@/constants/Config'
 import { NewsDataType } from '@/types'
 import BreakingNews from '@/components/BreakingNews'
 import Categories from '@/components/Categories'
-import NewsList from '@/components/NewsList'
-import Loading from '@/components/Loading'
+import NewsItem from '@/components/NewsItem'
+import SkeletonLoading from '@/components/SkeletonLoading'
 import ErrorView from '@/components/ErrorView'
 import { useTheme } from '@/contexts/ThemeContext'
+import { useNewsData } from '@/hooks/useNewsData'
+import { Link } from 'expo-router'
 
 type Props = {}
 
 const Page = (props: Props) => {
   const { top: safeTop } = useSafeAreaInsets()
   const { colors } = useTheme()
-  const [breakingNewsData, setBreakingNewsData] = useState<NewsDataType[]>([])
-  const [news, setNews] = useState<NewsDataType[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [refreshing, setRefreshing] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
-  const [error, setError] = useState<string | null>(null)
-
-  //call api breaking news
-  const getBreakingNews = async () => {
-    try {
-      setError(null)
-      const URL = `https://newsdata.io/api/1/latest?apikey=${PUBLIC_API_KEY}&language=vi&country=vi&image=1&removeduplicate=1&size=5`
-      const response = await axios.get(URL)
-
-      if (response && response.data) {
-        setBreakingNewsData(response.data.results)
-      }
-    } catch (error: any) {
-      console.log('Breaking news error:', error)
-      setError('Không thể tải tin tức nổi bật')
-    }
-  }
+  const [refreshing, setRefreshing] = useState(false)
+  const [currentCategory, setCurrentCategory] = useState('')
   
-  const getNews = async (category: string) => {
-    try {
-      setError(null)
-      let categoryString = ''
-      if (category.length !== 0) {
-        categoryString = `&category=${category}`
-      }
-      const URL = `https://newsdata.io/api/1/latest?apikey=${PUBLIC_API_KEY}&language=vi&country=vi&image=1&removeduplicate=1&size=10${categoryString}`
-      const response = await axios.get(URL)
-
-      if (response && response.data) {
-        setNews(response.data.results)
-      }
-    } catch (error: any) {
-      console.log('News error:', error)
-      setError('Không thể tải danh sách tin tức')
-    }
-  }
-
-  const onCatChanged = (category: string) => {
-    setNews([])
-    getNews(category)
-  }
+  const {
+    breakingNews,
+    news,
+    isLoading,
+    error,
+    refreshData,
+    fetchNewsByCategory,
+  } = useNewsData();
 
   const onRefresh = useCallback(async () => {
-    setRefreshing(true)
-    setError(null)
+    setRefreshing(true);
     try {
-      await Promise.all([getBreakingNews(), getNews('')])
-    } catch (error) {
-      console.log('Error refreshing:', error)
-      setError('Không thể làm mới dữ liệu')
+      await refreshData();
+      setCurrentCategory('');
     } finally {
-      setRefreshing(false)
+      setRefreshing(false);
     }
-  }, [])
+  }, [refreshData]);
 
-  const retryLoading = useCallback(async () => {
-    setIsLoading(true)
-    setError(null)
-    try {
-      await Promise.all([getBreakingNews(), getNews('')])
-    } catch (error) {
-      console.log('Error retrying:', error)
-      setError('Không thể tải dữ liệu')
-    } finally {
-      setIsLoading(false)
-    }
-  }, [])
-
-  useEffect(() => {
-    retryLoading()
-  }, [])
+  const onCatChanged = useCallback((category: string) => {
+    setCurrentCategory(category);
+    fetchNewsByCategory(category);
+  }, [fetchNewsByCategory]);
 
   if (error && !isLoading) {
     return (
       <View style={[styles.container, { paddingTop: safeTop, backgroundColor: colors.background }]}>
         <Header />
-        <ErrorView message={error} onRetry={retryLoading} />
+        <ErrorView message={error} onRetry={refreshData} />
       </View>
     )
   }
 
+  const renderHeader = () => (
+    <>
+      <Header />
+      <SearchBar withHorizontalPadding={true} setSearchQuery={setSearchQuery} />
+      {isLoading ? (
+        <SkeletonLoading count={8} />
+      ) : (
+        <BreakingNews newList={breakingNews} />
+      )}
+      <Categories onCategoryChanged={onCatChanged} currentCategory={currentCategory} />
+    </>
+  );
+
+  const renderNewsItem = ({ item }: { item: NewsDataType }) => (
+    <Link href={`/news/${item.article_id}` as any} asChild>
+      <TouchableOpacity style={styles.newsItemContainer} activeOpacity={0.8}>
+        <NewsItem item={item} />
+      </TouchableOpacity>
+    </Link>
+  );
+
   return (
-    <ScrollView 
+    <FlatList
       style={[styles.container, { paddingTop: safeTop, backgroundColor: colors.background }]}
+      data={news}
+      renderItem={renderNewsItem}
+      ListHeaderComponent={renderHeader}
+      keyExtractor={(item) => item.article_id}
       refreshControl={
         <RefreshControl
           refreshing={refreshing}
@@ -115,19 +91,13 @@ const Page = (props: Props) => {
           colors={[colors.tint]}
         />
       }
-    >
-      <Header />
-      <SearchBar withHorizontalPadding={true} setSearchQuery={setSearchQuery} />
-      {
-        isLoading ? (
-          <Loading size='large' />
-        ) : (
-          <BreakingNews newList={breakingNewsData} />
-        )
-      }
-      <Categories onCategoryChanged={onCatChanged} />
-      <NewsList newsList={news} />
-    </ScrollView>
+      showsVerticalScrollIndicator={false}
+      removeClippedSubviews={true}
+      maxToRenderPerBatch={10}
+      windowSize={10}
+      initialNumToRender={5}
+      contentContainerStyle={styles.contentContainer}
+    />
   )
 }
 
@@ -136,5 +106,11 @@ export default Page
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  contentContainer: {
+    paddingBottom: 50,
+  },
+  newsItemContainer: {
+    marginHorizontal: 20,
   },
 })

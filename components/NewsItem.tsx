@@ -1,56 +1,9 @@
 import { Colors } from '@/constants/Colors'
 import { NewsDataType } from '@/types'
 import React, { memo } from 'react'
-import { FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import Loading from './Loading'
+import { Image, StyleSheet, Text, View } from 'react-native'
 import BookmarkButton from './BookmarkButton'
-import { Link } from 'expo-router'
 import { useTheme } from '@/contexts/ThemeContext'
-
-type Props = {
-    newsList: NewsDataType[]
-}
-
-const NewsList = ({ newsList }: Props) => {
-    const { colors } = useTheme();
-
-    if (newsList.length === 0) {
-        return <Loading size='large' />
-    }
-
-    const renderItem = ({ item }: { item: NewsDataType }) => (
-        <Link href={`/news/${item.article_id}` as any} asChild>
-            <TouchableOpacity>
-                <NewsItem item={item} />
-            </TouchableOpacity>
-        </Link>
-    );
-
-    const keyExtractor = (item: NewsDataType) => item.article_id;
-
-    return (
-        <View style={styles.container}>
-            <FlatList
-                data={newsList}
-                renderItem={renderItem}
-                keyExtractor={keyExtractor}
-                showsVerticalScrollIndicator={false}
-                removeClippedSubviews={true}
-                maxToRenderPerBatch={10}
-                windowSize={10}
-                initialNumToRender={5}
-                getItemLayout={(data, index) => ({
-                    length: 120, // Approximate height of each item
-                    offset: 120 * index,
-                    index,
-                })}
-                contentContainerStyle={styles.listContainer}
-            />
-        </View>
-    )
-}
-
-export default NewsList
 
 const NewsItem = memo(({ item }: { item: NewsDataType }) => {
     const { colors } = useTheme();
@@ -95,16 +48,9 @@ const NewsItem = memo(({ item }: { item: NewsDataType }) => {
 
 NewsItem.displayName = 'NewsItem';
 
-export { NewsItem };
+export default NewsItem;
 
 const styles = StyleSheet.create({
-    container: {
-        marginHorizontal: 20,
-        marginBottom: 50
-    },
-    listContainer: {
-        paddingBottom: 20
-    },
     itemContainer: {
         flexDirection: "row",
         alignItems: "flex-start",
@@ -162,4 +108,4 @@ const styles = StyleSheet.create({
         gap: 6,
         alignItems: 'center'
     }
-})
+}) 

@@ -4,7 +4,9 @@ import { Dimensions, Image, StyleSheet, Text, TouchableOpacity, View } from 'rea
 import Animated, { Extrapolation, interpolate, SharedValue, useAnimatedStyle } from 'react-native-reanimated'
 import { LinearGradient } from 'expo-linear-gradient'
 import { Colors } from '@/constants/Colors'
-import { Link } from 'expo-router'
+import { router } from 'expo-router'
+import { useTheme } from '@/contexts/ThemeContext'
+
 type Props = {
     sliderItem: NewsDataType,
     index: number,
@@ -13,29 +15,10 @@ type Props = {
 
 const { width } = Dimensions.get('screen')
 const ITEM_WIDTH = width * 0.85;
+
 const SliderItem = ({ sliderItem, index, scrollX }: Props) => {
-    // const rnStyle = useAnimatedStyle(() => {
-    //     return {
-    //         transform: [
-    //             {
-    //                 translateX: interpolate(
-    //                     scrollX.value,
-    //                     [(index - 1) * ITEM_WIDTH, index * ITEM_WIDTH, (index + 1) * ITEM_WIDTH],
-    //                     [-width * 0.15, 0, width * 0.15],
-    //                     Extrapolation.CLAMP
-    //                 ),
-    //             },
-    //             {
-    //                 scale: interpolate(
-    //                     scrollX.value,
-    //                     [(index - 1) * ITEM_WIDTH, index * ITEM_WIDTH, (index + 1) * ITEM_WIDTH],
-    //                     [0.6, 1, 0.6],
-    //                     Extrapolation.CLAMP
-    //                 ),
-    //             },
-    //         ],
-    //     };
-    // });
+    const { colors } = useTheme();
+    
     const rnStyle = useAnimatedStyle(() => {
         const inputRange = [
             (index - 1) * ITEM_WIDTH,
@@ -73,41 +56,64 @@ const SliderItem = ({ sliderItem, index, scrollX }: Props) => {
         };
     });
 
+    const handlePress = () => {
+        console.log('SliderItem pressed, article_id:', sliderItem.article_id);
+        console.log('SliderItem title:', sliderItem.title);
+        router.push(`/news/${sliderItem.article_id}`);
+    };
+
     return (
-        <Link href={`/news/${sliderItem.article_id}` as any} asChild>
-            <TouchableOpacity>
-                <Animated.View style={[styles.itemWrapper, rnStyle]} key={sliderItem.article_id}>
-                    <View style={{ borderRadius: 20, overflow: 'hidden' }}>
-
-
-                        <Image source={{ uri: sliderItem.image_url }} style={styles.image} />
-                        <LinearGradient
-                            colors={['transparent', 'rgba(0,0,0,0.8)']}
-                            style={styles.background}
-                        >
-                            <View style={styles.sourceInfo}>
-                                {sliderItem.source_icon && (
-                                    <Image source={{ uri: sliderItem.source_icon }} style={styles.srcIcon} />
-                                )}
-                                <Text style={styles.sourceName} >{sliderItem.source_name}</Text>
-                            </View>
-                            <Text style={styles.title} numberOfLines={2}>{sliderItem.title}</Text>
-
-                        </LinearGradient>
-                    </View>
-                </Animated.View>
-            </TouchableOpacity>
-        </Link>
+        <TouchableOpacity 
+            onPress={handlePress} 
+            activeOpacity={0.9}
+            style={styles.pressable}
+        >
+            <Animated.View style={[styles.itemWrapper, rnStyle]}>
+                <View style={[styles.imageContainer, { backgroundColor: colors.cardBackground }]}>
+                    <Image source={{ uri: sliderItem.image_url }} style={styles.image} />
+                    <LinearGradient
+                        colors={['transparent', 'rgba(0,0,0,0.8)']}
+                        style={styles.background}
+                    >
+                        <View style={styles.sourceInfo}>
+                            {sliderItem.source_icon && (
+                                <Image source={{ uri: sliderItem.source_icon }} style={styles.srcIcon} />
+                            )}
+                            <Text style={styles.sourceName}>{sliderItem.source_name}</Text>
+                        </View>
+                        <Text style={styles.title} numberOfLines={2}>{sliderItem.title}</Text>
+                    </LinearGradient>
+                </View>
+            </Animated.View>
+        </TouchableOpacity>
     )
 }
 
 export default SliderItem
+
 const styles = StyleSheet.create({
+    pressable: {
+        width: ITEM_WIDTH,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
     itemWrapper: {
         position: 'relative',
         width: ITEM_WIDTH,
         justifyContent: 'center',
         alignItems: 'center'
+    },
+    imageContainer: {
+        borderRadius: 20,
+        overflow: 'hidden',
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 4,
+        },
+        shadowOpacity: 0.3,
+        shadowRadius: 4.65,
+        elevation: 8,
     },
     image: {
         width: ITEM_WIDTH,

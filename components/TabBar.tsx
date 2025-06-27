@@ -5,7 +5,10 @@ import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-na
 import { useState } from "react";
 import { Colors } from "@/constants/Colors";
 import React from "react";
+import { useTheme } from '@/contexts/ThemeContext';
+
 export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
+  const { colors } = useTheme();
   const [dimensions, setDimensions] = useState({ height: 20, width: 100 });
 
   const buttonWidth = dimensions.width / state.routes.length;
@@ -26,10 +29,10 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
   });
 
   return (
-    <View onLayout={onTabbarLayout} style={styles.tabbar}>
+    <View onLayout={onTabbarLayout} style={[styles.tabbar, { backgroundColor: colors.cardBackground }]}>
       <Animated.View style={[animatedStyle, {
         position: 'absolute',
-        backgroundColor: Colors.tint,
+        backgroundColor: colors.tint,
         top: 56,
         left: 34,
         height: 4,
@@ -77,7 +80,7 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
             onLongPress={onLongPress}
             isFocused={isFocused}
             routeName={route.name}
-            label={label}
+            label={typeof label === 'string' ? label : route.name}
           />
         );
       })}
@@ -90,6 +93,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingTop: 16,
     paddingBottom: 40,
-    backgroundColor: Colors.white,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: -2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
   }
 })

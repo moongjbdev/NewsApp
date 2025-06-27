@@ -8,12 +8,13 @@ import CheckBox from '@/components/CheckBox'
 import useNewsCategories from '@/hooks/useNewsCategories'
 import useNewsCountries from '@/hooks/useNewsCountries'
 import { Link } from 'expo-router'
-
+import { useTheme } from '@/contexts/ThemeContext'
 
 type Props = {}
 
 const Page = (props: Props) => {
   const { top: safeTop } = useSafeAreaInsets()
+  const { colors } = useTheme()
 
   const { newsCategories, toggleNewsCategory } = useNewsCategories()
   const { newsCountries, toggleNewsCountry } = useNewsCountries()
@@ -21,12 +22,10 @@ const Page = (props: Props) => {
   const [category, setCategory] = useState<string[]>([])
   const [country, setCountry] = useState<string[]>([])
 
-
-
   return (
-    <View style={[styles.container, { paddingTop: safeTop + 20 }]}>
+    <View style={[styles.container, { paddingTop: safeTop + 20, backgroundColor: colors.background }]}>
       <SearchBar withHorizontalPadding={false} setSearchQuery={setSearchQuery} />
-      <Text style={styles.title}>Thể Loại</Text>
+      <Text style={[styles.title, { color: colors.black }]}>Thể Loại</Text>
       <View style={styles.listContainer}>
         {
           newsCategories.map((item, index) => (
@@ -37,9 +36,9 @@ const Page = (props: Props) => {
                 toggleNewsCategory(item.id);
                 setCategory(prev => {
                   if (item.selected) {
-                    return prev.filter(slug => slug !== item.slug); // nếu đang selected → bỏ ra
+                    return prev.filter(slug => slug !== item.slug);
                   } else {
-                    return [...prev, item.slug]; // nếu đang bỏ → thêm vào
+                    return [...prev, item.slug];
                   }
                 });
               }}
@@ -47,7 +46,7 @@ const Page = (props: Props) => {
           ))
         }
       </View>
-      <Text style={styles.title}>Quốc Gia</Text>
+      <Text style={[styles.title, { color: colors.black }]}>Quốc Gia</Text>
       <View style={styles.listContainer}>
         {
           newsCountries.map((item, index) => (
@@ -63,18 +62,17 @@ const Page = (props: Props) => {
                     return [...prev, item.code];
                   }
                 });
-
               }}
             />
           ))
         }
       </View>
-      <Link style={styles.searchBtn} href={{
+      <Link style={[styles.searchBtn, { backgroundColor: colors.tint }]} href={{
         pathname: `/news/search`,
         params: { query: searchQuery, category: category.join(','), country: country.join(',') }
       }} asChild>
         <TouchableOpacity >
-          <Text style={styles.searchBtnTxt}>Tìm Kiếm</Text>
+          <Text style={[styles.searchBtnTxt, { color: colors.white }]}>Tìm Kiếm</Text>
         </TouchableOpacity>
       </Link>
     </View>
@@ -91,7 +89,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: '600',
-    color: Colors.black,
     marginBottom: 10,
   },
   listContainer: {
@@ -102,15 +99,12 @@ const styles = StyleSheet.create({
     marginBottom: 13,
   },
   searchBtn: {
-    backgroundColor: Colors.tint,
     alignItems: 'center',
     padding: 14,
     borderRadius: 10,
     marginVertical: 10,
-    // justifyContent: 'center'
   },
   searchBtnTxt: {
-    color: Colors.white,
     fontSize: 16,
     fontWeight: '600'
   }
