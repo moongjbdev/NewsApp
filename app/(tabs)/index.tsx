@@ -1,5 +1,5 @@
 import { FlatList, StyleSheet, Text, View, RefreshControl, TouchableOpacity } from 'react-native'
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useMemo } from 'react'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import Header from '@/components/Header'
 import SearchBar from '@/components/SearchBar'
@@ -55,7 +55,7 @@ const Page = (props: Props) => {
     )
   }
 
-  const renderHeader = () => (
+  const renderHeader = useMemo(() => (
     <>
       <Header />
       <SearchBar withHorizontalPadding={true} setSearchQuery={setSearchQuery} />
@@ -66,7 +66,7 @@ const Page = (props: Props) => {
       )}
       <Categories onCategoryChanged={onCatChanged} currentCategory={currentCategory} />
     </>
-  );
+  ), [isLoading, breakingNews, onCatChanged, currentCategory]);
 
   const renderNewsItem = ({ item }: { item: NewsDataType }) => (
     <Link href={`/news/${item.article_id}` as any} asChild>

@@ -36,8 +36,9 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
         top: 56,
         left: 34,
         height: 4,
-        width: 40,
-        borderRadius: 2
+        width: 30,
+        borderRadius: 2,
+        justifyContent: 'center',
       }]} />
       {state.routes.map((route, index) => {
         const { options } = descriptors[route.key];

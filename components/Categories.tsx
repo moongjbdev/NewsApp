@@ -11,7 +11,7 @@ type Props = {
     currentCategory?: string
 }
 
-const Categories = ({ onCategoryChanged, currentCategory }: Props) => {
+const Categories = React.memo(({ onCategoryChanged, currentCategory }: Props) => {
     const { colors } = useTheme();
     const scrollRef = useRef<ScrollView>(null);
     const itemRef = useRef<TouchableOpacity[] | null[]>([]);
@@ -24,28 +24,11 @@ const Categories = ({ onCategoryChanged, currentCategory }: Props) => {
             if (index !== -1) {
                 setActiveIndex(index);
             }
-        } else {
-            setActiveIndex(0);
         }
     }, [currentCategory]);
 
     const handleSelectCategory = (index: number) => {
-        const selected = itemRef.current[index];
-        const scrollViewNode = findNodeHandle(scrollRef.current);
-
-        if (selected && scrollViewNode) {
-            selected.measureLayout(
-                scrollViewNode,
-                (x, y, width, height) => {
-                    scrollRef.current?.scrollTo({
-                        x: x - 20,
-                        y: 0,
-                        animated: true
-                    });
-                },
-            );
-            setActiveIndex(index);
-        }
+        setActiveIndex(index);
         onCategoryChanged(newsCategoryList[index].slug)
     };
 
@@ -85,7 +68,9 @@ const Categories = ({ onCategoryChanged, currentCategory }: Props) => {
             </ScrollView>
         </View>
     )
-}
+});
+
+Categories.displayName = 'Categories';
 
 export default Categories
 

@@ -1,7 +1,8 @@
 
 // API Configuration
 // Get API key from newsdata.io free
-export const PUBLIC_API_KEY = 'pub_2e6bf1dcbf5441988b2b4ab6c5ee14a1';
+//3b064333d14840cb8504d70cca0c161f  api from site free
+export const PUBLIC_API_KEY = 'pub_78ea72dff8f24d26a18fd0a926ff5d30';
 
 // API Base URL
 export const API_BASE_URL = 'https://newsdata.io/api/1/latest';

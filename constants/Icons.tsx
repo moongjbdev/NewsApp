@@ -1,3 +1,4 @@
+import React from "react";
 import { Ionicons } from "@expo/vector-icons";
 
 export const icon = {
@@ -9,15 +10,15 @@ export const icon = {
     ),
   discover: ({ color, focused }: { color: string; focused: boolean }) =>
     focused ? (
-      <Ionicons name="compass" size={25} color={color} />
+      <Ionicons name="compass" size={24} color={color} />
     ) : (
-      <Ionicons name="compass-outline" size={25} color={color} />
+      <Ionicons name="compass-outline" size={24} color={color} />
     ),
   saved: ({ color, focused }: { color: string; focused: boolean }) =>
     focused ? (
-      <Ionicons name="bookmarks" size={22} color={color} />
+      <Ionicons name="bookmarks" size={24} color={color} />
     ) : (
-      <Ionicons name="bookmarks-outline" size={22} color={color} />
+      <Ionicons name="bookmarks-outline" size={24} color={color} />
     ),
   settings: ({ color, focused }: { color: string; focused: boolean }) =>
     focused ? (
