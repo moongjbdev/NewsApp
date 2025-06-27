@@ -3,10 +3,12 @@ import axios from 'axios'
 import { Link, router, Stack, useLocalSearchParams } from 'expo-router'
 import React, { useEffect, useState } from 'react'
 import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import { PUBLIC_API_KEY } from '@env'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { PUBLIC_API_KEY } from '@/constants/Config'
 import { Ionicons } from '@expo/vector-icons'
 import Loading from '@/components/Loading'
 import { NewsItem } from '@/components/NewsList'
+
 const search = () => {
     const { query, category, country } = useLocalSearchParams<{ query: string, category: string, country: string }>()
     const [news, setNews] = useState<NewsDataType[]>([])

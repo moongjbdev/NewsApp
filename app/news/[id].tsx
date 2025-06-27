@@ -1,16 +1,17 @@
-
 import { Colors } from '@/constants/Colors'
 import { NewsDataType } from '@/types'
 import { Ionicons } from '@expo/vector-icons'
 import { router, Stack, useLocalSearchParams } from 'expo-router'
 import React, { useEffect, useState } from 'react'
-import { Alert, findNodeHandle, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import { PUBLIC_API_KEY } from '@env'
+import { Alert, findNodeHandle, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View, Linking } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { PUBLIC_API_KEY } from '@/constants/Config'
 import axios from 'axios'
 import Loading from '@/components/Loading'
 import { getFakeContentByCategory } from '@/constants/ContentFake'
 import Moment from 'moment'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+
 type Props = {
     newsList: NewsDataType | null
 }
